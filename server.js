@@ -13,11 +13,6 @@ MongoClient.connect(
 
     db = client.db("todoapp");
 
-    db.collection("post").insertOne({ 이름: "John", _id: 100 }, function (에러, 결과) {
-        console.log("저장완료");
-      }
-    );
-
     app.listen(8080, function () {
       console.log("listening on 8080");
     });
@@ -46,4 +41,7 @@ app.post("/add", function (요청, 응답) {
   console.log(요청.body.title);
   console.log(요청.body.date);
   //db에 저장해주세요
+  db.collection('post').insertOne({제목: 요청.body.title, 날짜: 요청.body.date }, function(에러,결과) {
+      console.log('DB에 저장완료');
+  });
 });

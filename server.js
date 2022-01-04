@@ -107,3 +107,16 @@ app.delete("/delete", function(요청, 응답){
     응답.status(200).send({message: '성공했습니다'});
   })
 })
+
+
+//상세페이지
+//detail로 접속하면 detail.ejs 보여줌
+//detail2로 접속하면 detail2.ejs 보여줌
+app.get('/detail/:id', function(요청, 응답){
+  
+  db.collection('post').findOne({_id : parseInt(요청.params.id)}, function(에러, 결과){
+    console.log(결과);
+    응답.render('detail.ejs', { data : 결과 });
+  })
+  
+})

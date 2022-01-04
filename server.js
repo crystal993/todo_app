@@ -7,6 +7,8 @@ const MongoClient = require("mongodb").MongoClient;
 
 app.set("view engine", "ejs");
 
+app.use('/public', express.static('public'));
+
 MongoClient.connect(
   "mongodb+srv://admin:admin1234@cluster0.ir1mp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
   function (에러, client) {

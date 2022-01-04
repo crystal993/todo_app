@@ -89,6 +89,21 @@ app.get("/list", function (요청, 응답) {
       // 2. 결과라는 데이터를 posts 라는 이름으로 list.ejs 파일에 보낸다.
       응답.render("list.ejs", { posts: 결과 });
     });
-
   
 });
+
+//게시글 삭제
+app.delete("/delete", function(요청, 응답){
+  console.log(요청.body);
+
+  // 문자열을 숫자로 변환
+  요청.body._id = parseInt(요청.body._id);
+  
+  // 삭제
+  db.collection('post').deleteOne(요청.body,function(에러,결과){
+    console.log('삭제완료');
+
+    //응답코드가 성공하면 200
+    응답.status(200).send({message: '성공했습니다'});
+  })
+})

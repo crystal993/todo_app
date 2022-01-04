@@ -75,18 +75,20 @@
     </div>
     <% } %>  -->
     
-    <% for (var i = 0; i < posts.length; i++ ){ %>
-      <li class="list-group-item" >
+    <div class="container">
+      <% for (var i = 0; i < posts.length; i++ ){ %>
+        <li class="list-group-item" >
+          
+          <h4><a href="/detail/<%= posts[i]._id %>" style="text-decoration:none;">
+            할 일 : <%= posts[i].제목 %></a></h4>
+          
+          <p>Date: <%= posts[i].날짜 %> </p>
+          
+          <button id="delete" data-id="<%= posts[i]._id %>" type="button" class="btn btn-info" >삭제</button>
         
-        <h4><a href="/detail/<%= posts[i]._id %>" style="text-decoration:none;">
-          할 일 : <%= posts[i].제목 %></a></h4>
-        
-        <p>Date: <%= posts[i].날짜 %> </p>
-        
-        <button id="delete" data-id="<%= posts[i]._id %>" type="button" class="btn btn-info" >삭제</button>
-      
-      </li>
-    <% } %>
+        </li>
+      <% } %>
+   </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 

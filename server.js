@@ -44,13 +44,20 @@ app.post("/add", function (요청, 응답) {
   console.log(요청.body.title);
   console.log(요청.body.date);
 
+  //1. db에 counter컬렉션에 현재 총 게시물 갯수 데이터 찾아오기 
   db.collection('counter').findOne({name : '게시물 갯수'},function(에러,결과){
     console.log(결과.totalPost);
     var 총게시물갯수 = 결과.totalPost;
 
-    //db에 저장
+    //2. db에 todo id,제목,날짜 저장
     db.collection('post').insertOne({_id : 총게시물갯수 + 1, 제목: 요청.body.title, 날짜: 요청.body.date }, function(에러,결과) {
         console.log('DB에 저장완료');
+
+        //3. db에 counter 컬렉션에 총 게시물 갯수 1씩 증가
+        db.collection('counter').updateOne({name: '게시물 갯수'},{$inc : {totalPost:1}}, function(에러, 결과){
+          if(에러){return console.log(에러)}
+
+        })
     });
   });
 
@@ -58,7 +65,7 @@ app.post("/add", function (요청, 응답) {
 
 
 
-// 게시글 출력
+// 게시글 리스트
 app.get('/list', function(요청,응답){
     
     db.collection('post').find().toArray(function(에러, 결과){

@@ -37,7 +37,7 @@ app.get("/", function (요청, 응답) {
 });
 
 app.get("/write", function (요청, 응답) {
-  응답.sendFile(__dirname + "/write.html");
+  응답.render("write.ejs");
 });
 
 // 게시글 등록

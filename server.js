@@ -175,3 +175,55 @@ app.put("/edit", function (요청, 응답) {
 //     });
 
 // });
+
+
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const session = require('express-session');
+
+app.use(session({secret: '비밀코드', resave : true, saveUninitialized:false}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+//login
+app.get('/login', function(요청, 응답){
+  응답.render('login.ejs');
+});
+
+app.post('/login', passport.authenticate('local',{
+  failureRedirect : '/fail'
+}), function(요청, 응답){
+  응답.redirect('/');
+});
+
+// 아이디/비번 DB와 맞는지 비교 
+// LocalStrategy 인증 방식
+passport.use(new LocalStrategy({
+  usernameField: 'id',
+  passwordField: 'pw',
+  session: true, // 세션에 저장하는지 여부
+  passReqToCallback: false, // 아이디/비번 말고도 다른 정보 검증시에 true
+}, function (입력한아이디, 입력한비번, done) {
+  // 이 부분은 아이디와 비밀번호를 검증하는 부분
+  // console.log(입력한아이디, 입력한비번);
+  db.collection('login').findOne({ id: 입력한아이디 }, function (에러, 결과) {
+    if (에러) return done(에러)
+
+    if (!결과) return done(null, false, { message: '존재하지않는 아이디요' })
+    if (입력한비번 == 결과.pw) {
+      return done(null, 결과)
+    } else {
+      return done(null, false, { message: '비번틀렸어요' })
+    }
+  })
+}));
+
+//세션 만들고 세션아이디 발급해서 쿠키로 보내주기 
+passport.serializeUser(function (user, done) {
+  done(null, user.id)
+});
+
+passport.deserializeUser(function (아이디, done) {
+  done(null, {})
+}); 

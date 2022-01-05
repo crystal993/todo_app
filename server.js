@@ -13,7 +13,12 @@ app.use("/public", express.static("public"));
 const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
 
+// .env 환경 설정에 필요함
 require('dotenv').config();
+
+// 패스워드 암호화 bcrypt
+// npm install bcrypt
+const bcrypt = require('bcrypt')
 
 MongoClient.connect(
   process.env.DB_URL,
@@ -253,3 +258,22 @@ passport.deserializeUser(function (아이디, done) {
     done(null,결과)
   })
 }); 
+
+
+//회원가입 페이지 
+app.get('/signup', function(request,response){
+  response.render('sign_up.ejs');
+});
+
+//회원가입
+app.post('/signup',function(request,response){
+
+  let encryptedPassowrd = bcrypt.hashSync(request.body.pw, 10) // sync, hashSync
+
+  db.collection('login').insertOne({id : request.body.id, pw:encryptedPassowrd, address:request.body.address },function(error, result){
+    // console.log('id:',request.body.id);
+    // console.log('pw:',request.body.pw);
+    // console.log('address:',request.body.address);
+    response.render('login.ejs');  
+  });
+});

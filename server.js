@@ -10,6 +10,9 @@ app.set("view engine", "ejs");
 
 app.use("/public", express.static("public"));
 
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
+
 MongoClient.connect(
   "mongodb+srv://admin:admin1234@cluster0.ir1mp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
   function (에러, client) {
@@ -133,26 +136,41 @@ app.get("/edit/:id", function (요청, 응답) {
   );
 });
 
-// 게시글 수정1 - post요청으로 수정하는 방법
-app.post("/edit/:id", function (요청, 응답) {
-  //게시글 내용 db에 수정
+// 게시글 수정1 - put요청으로 수정하는 방법
+// 라이브러리 설치 npm install method-override
+app.put("/edit", function (요청, 응답) {
+  //폼에 담긴 제목, 날짜 데이터를 수정
   db.collection("post").updateOne(
-    { _id: parseInt(요청.params.id) },
-    {
-      $set: { 제목: 요청.body.title, 날짜: 요청.body.date },
-      function(에러, 결과) {
-        if (에러) {
-          console.log(에러);
-        }
-      },
-    }
-  );
-
-  //수정한 데이터 가져오기
-  db.collection("post")
-    .find()
-    .toArray(function (에러, 결과) {
-      응답.render("list.ejs", {posts: 결과});
+    { _id: parseInt(요청.body.id) },
+    { $set: { 제목: 요청.body.title, 날짜: 요청.body.date } },
+    function (에러, 결과) {
+      console.log('수정완료');
+      응답.redirect('/list');
     });
-
 });
+
+// 게시글 수정2 - post요청으로 수정하는 방법
+// app.post("/edit/:id", function (요청, 응답) {
+//   //게시글 내용 db에 수정
+//   db.collection("post").updateOne(
+//     { _id: parseInt(요청.params.id) },
+//     {
+//       $set: { 제목: 요청.body.title, 날짜: 요청.body.date },
+//       function(에러, 결과) {
+//         if (에러) {
+//           console.log(에러);
+//         }
+//          응답.redirect('/list');
+//       },
+//     }
+//   );
+
+//   // 응답.redirect('/list');쓰면 밑에 과정 생략가능
+//   //수정한 데이터 가져오기
+//   db.collection("post")
+//     .find()
+//     .toArray(function (에러, 결과) {
+//       응답.render("list.ejs", {posts: 결과});
+//     });
+
+// });

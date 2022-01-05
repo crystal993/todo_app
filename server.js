@@ -197,6 +197,25 @@ app.post('/login', passport.authenticate('local',{
   응답.redirect('/');
 });
 
+// 마이페이지에 접속 - 회원만
+app.get('/mypage', loginCheck, function(request,response){
+  console.log(request.user);
+  response.render('myPage.ejs', {사용자 : request.user});
+})
+
+// 로그인 여부 체크
+function loginCheck(request, response, next){
+  if(request.user){
+    //request.user가 있으면 next() 통과
+    next();
+  } else {
+    //request.user가 없으면 경고메세지
+    response.send('로그인 안 하셨는데요??');
+  }
+}
+
+
+
 // 아이디/비번 DB와 맞는지 비교 
 // LocalStrategy 인증 방식
 passport.use(new LocalStrategy({
@@ -224,6 +243,11 @@ passport.serializeUser(function (user, done) {
   done(null, user.id)
 });
 
+//로그인한 유저의 개인 정보를 db에서 찾는 역할
 passport.deserializeUser(function (아이디, done) {
-  done(null, {})
+  //db에서 위에 있는 user.id를 유저를 찾은 뒤에 유저정보를 
+  // done(null, {여기에 넣는다})
+  db.collection('login').findOne({id : 아이디}, function(에러, 결과){
+    done(null,결과)
+  })
 }); 

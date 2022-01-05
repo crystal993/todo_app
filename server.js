@@ -13,15 +13,17 @@ app.use("/public", express.static("public"));
 const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
 
+require('dotenv').config();
+
 MongoClient.connect(
-  "mongodb+srv://admin:admin1234@cluster0.ir1mp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+  process.env.DB_URL,
   function (에러, client) {
     //연결되면 할 일
     if (에러) return console.log(에러);
 
     db = client.db("todoapp");
 
-    app.listen(8080, function () {
+    app.listen(process.env.PORT, function () {
       console.log("listening on 8080");
     });
   }

@@ -201,18 +201,19 @@ app.use(function (req, res, next) {
   next();
 });
 
-//login
+//login 페이지 //1
 app.get("/login", function (요청, 응답) {
   응답.render("login.ejs");
 });
 
+//login 기능 //2
 app.post(
   "/login",
   passport.authenticate("local", {
     failureRedirect: "/fail",
   }),
   function (요청, 응답) {
-    응답.redirect("/");
+    응답.render("index.ejs", {isAuthenticated : true});
   }
 );
 

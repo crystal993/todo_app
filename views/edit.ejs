@@ -15,7 +15,9 @@
       integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn"
       crossorigin="anonymous"
     />
-    
+
+    <title>Todo</title>
+
     <!-- fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,80 +28,35 @@
 
     <!-- main.css -->
     <link rel="stylesheet" href="/public/main.css">
-
-    
-    <title>Todo</title>
+  
   </head>
   <body>
-
     <!-- nav bar -->
     <%- include('nav.html') %>
 
-    <h2 style="text-align: center; margin:10px;">To Do List</h2>
-    
-    <!-- 서버에서 가져온 할 일 리스트 -->
+    <!-- write form -->
 
-    <!-- <% for (var i = 0; i < posts.length; i++ ){ %>
-    <div>
-        <h4>할일 제목: <%= posts[i].제목 %> </h4>
-        <p>마감 날짜: <%= posts[i].날짜 %> </p>
-        <button>삭제</button>
+    <h4 class="container mt-4"><strong>기록해도 안 할 거 알지만...</strong></h4>
+
+    <div class="container mt-3">
+      <form action="/edit/<%= data._id %>" method="POST">
+        <div class="form-group">
+          <label>오늘의 할일</label>
+          <input type="text" class="form-control" name="title" value="<%= data.제목 %>"/> 
+        </div>
+        <div class="form-group">
+          <label>날짜</label>
+          <input type="text" class="form-control" name="date" value="<%= data.날짜 %>" />
+        </div>
+        <button type="submit" class="btn btn-outline-secondary">Submit</button>
+      </form>
     </div>
-    <% } %>  -->
-    
-    <div class="container">
-      <% for (var i = 0; i < posts.length; i++ ){ %>
-        <li class="list-group-item" >
-          
-          <h4><a href="/detail/<%= posts[i]._id %>" style="text-decoration:none;">
-            할 일 : <%= posts[i].제목 %></a></h4>
-          
-          <p>Date: <%= posts[i].날짜 %> </p>
-          
-          <button id="delete" data-id="<%= posts[i]._id %>" type="button" class="btn btn-danger" >삭제</button>
-          <button id="edit" data-id="<%= posts[i]._id %>" type="button" class="btn btn-info" >수정</button>
-        </li>
-      <% } %>
-   </div>
-
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
-    <script>
-
-      //삭제기능
-      $('#delete').click(function(e){
-        
-        // 글번호 data-id에 저장된 요소를 가져오기
-        var 글번호 = e.target.dataset.id;
-        var 지금누른거 = $(this);
-
-        $.ajax({
-          method : 'DELETE',
-          url : '/delete/',
-          data : { _id : 글번호 }
-        }).done(function(결과){
-          //AJAX 성공
-          //1. 페이지를 새로고침
-          //2. 삭제버튼 누른 <li> 요소를 제거하거나 안 보이도록 
-            console.log('삭제 성공');
-            지금누른거.parent('li').fadeOut();
-
-        }).fail(function(xhr, textStatus, errorThrown){
-          //AJAX 실패
-          console.log(xhr, textStatus, errorThrown);
-        })
 
 
-      });
 
-    </script>
-
-    
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
-    
-    <!-- $.ajax()이거 쓰려면 slim버전은 주석처리해야함 -->
     <!-- <script
       src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
       integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

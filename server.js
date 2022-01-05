@@ -4,10 +4,11 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const MongoClient = require("mongodb").MongoClient;
+const { render } = require("express/lib/response");
 
 app.set("view engine", "ejs");
 
-app.use('/public', express.static('public'));
+app.use("/public", express.static("public"));
 
 MongoClient.connect(
   "mongodb+srv://admin:admin1234@cluster0.ir1mp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
@@ -81,7 +82,6 @@ app.post("/add", function (요청, 응답) {
 //db에 저장된 post라는 이름을 가진 collection 안의 모든 데이터를 보여주기
 // ejs파일로 보내줘야한다. 그냥 html파일만 보내주면 static페이지임.
 app.get("/list", function (요청, 응답) {
-
   // 1. post 콜렉션에 저장된 모든 데이터를 Array자료형으로 가져온다.
   db.collection("post")
     .find()
@@ -91,34 +91,68 @@ app.get("/list", function (요청, 응답) {
       // 2. 결과라는 데이터를 posts 라는 이름으로 list.ejs 파일에 보낸다.
       응답.render("list.ejs", { posts: 결과 });
     });
-  
 });
 
 //게시글 삭제
-app.delete("/delete", function(요청, 응답){
+app.delete("/delete", function (요청, 응답) {
   console.log(요청.body);
 
   // 문자열을 숫자로 변환
   요청.body._id = parseInt(요청.body._id);
-  
+
   // 삭제
-  db.collection('post').deleteOne(요청.body,function(에러,결과){
-    console.log('삭제완료');
+  db.collection("post").deleteOne(요청.body, function (에러, 결과) {
+    console.log("삭제완료");
 
     //응답코드가 성공하면 200
-    응답.status(200).send({message: '성공했습니다'});
-  })
-})
-
+    응답.status(200).send({ message: "성공했습니다" });
+  });
+});
 
 //상세페이지
 //detail로 접속하면 detail.ejs 보여줌
 //detail2로 접속하면 detail2.ejs 보여줌
-app.get('/detail/:id', function(요청, 응답){
-  
-  db.collection('post').findOne({_id : parseInt(요청.params.id)}, function(에러, 결과){
-    console.log(결과);
-    응답.render('detail.ejs', { data : 결과 });
-  })
-  
-})
+app.get("/detail/:id", function (요청, 응답) {
+  db.collection("post").findOne(
+    { _id: parseInt(요청.params.id) },
+    function (에러, 결과) {
+      console.log(결과);
+      응답.render("detail.ejs", { data: 결과 });
+    }
+  );
+});
+
+//게시글 수정 페이지
+app.get("/edit/:id", function (요청, 응답) {
+  db.collection("post").findOne(
+    { _id: parseInt(요청.params.id) },
+    function (에러, 결과) {
+      console.log(결과);
+      응답.render("edit.ejs", { data: 결과 });
+    }
+  );
+});
+
+// 게시글 수정1 - post요청으로 수정하는 방법
+app.post("/edit/:id", function (요청, 응답) {
+  //게시글 내용 db에 수정
+  db.collection("post").updateOne(
+    { _id: parseInt(요청.params.id) },
+    {
+      $set: { 제목: 요청.body.title, 날짜: 요청.body.date },
+      function(에러, 결과) {
+        if (에러) {
+          console.log(에러);
+        }
+      },
+    }
+  );
+
+  //수정한 데이터 가져오기
+  db.collection("post")
+    .find()
+    .toArray(function (에러, 결과) {
+      응답.render("list.ejs", {posts: 결과});
+    });
+
+});

@@ -144,9 +144,10 @@ app.put("/edit", function (요청, 응답) {
     { _id: parseInt(요청.body.id) },
     { $set: { 제목: 요청.body.title, 날짜: 요청.body.date } },
     function (에러, 결과) {
-      console.log('수정완료');
-      응답.redirect('/list');
-    });
+      console.log("수정완료");
+      응답.redirect("/list");
+    }
+  );
 });
 
 // 게시글 수정2 - post요청으로 수정하는 방법

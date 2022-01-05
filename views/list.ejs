@@ -60,7 +60,7 @@
           id="delete"
           data-id="<%= posts[i]._id %>"
           type="button"
-          class="btn btn-danger"
+          class="delete btn btn-danger"
         >
           삭제
         </button>
@@ -80,7 +80,8 @@
 
     <script>
       //삭제기능
-      $("#delete").click(function (e) {
+      // #delete에서 .delete로 변경 => 아이디는 한 요소만 삭제가능
+      $(".delete").click(function (e) {
         // 글번호 data-id에 저장된 요소를 가져오기
         var 글번호 = e.target.dataset.id;
         var 지금누른거 = $(this);

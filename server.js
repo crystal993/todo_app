@@ -160,7 +160,7 @@ app.get("/write", function (요청, 응답) {
 app.post("/add", function (요청, 응답) {
   // 참고 : 응답.send()이 부분은 없으면 브라우저 멈춤
   // 실패하든 성공하든 무조건 무언가 보내줘야 함.
-  응답.send("전송완료");
+  
   console.log(요청.body.title);
   console.log(요청.body.date);
 
@@ -170,6 +170,7 @@ app.post("/add", function (요청, 응답) {
     function (에러, 결과) {
       console.log(결과.totalPost);
       var 총게시물갯수 = 결과.totalPost;
+      응답.render("list.ejs", { posts: 결과, isAuthenticated:요청.isAuthenticated() });
 
       //2. db에 todo id,제목,날짜 저장
       db.collection("post").insertOne(
@@ -185,6 +186,7 @@ app.post("/add", function (요청, 응답) {
               if (에러) {
                 return console.log(에러);
               }
+              
             }
           );
         }
@@ -218,9 +220,9 @@ app.delete("/delete", function (요청, 응답) {
   // 삭제
   db.collection("post").deleteOne(요청.body, function (에러, 결과) {
     console.log("삭제완료");
-
+    if(에러) {console.log(에러);}
     //응답코드가 성공하면 200
-    응답.status(200).send({ message: "성공했습니다", isAuthenticated:요청.isAuthenticated() });
+    응답.status(200).send({ message: "성공했습니다"});
   });
 });
 

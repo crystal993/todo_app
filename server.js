@@ -281,6 +281,13 @@ passport.deserializeUser(function (아이디, done) {
   });
 });
 
+
+//로그아웃 
+app.get('/logout', function(request,response){
+  request.logout();
+  response.render('index.ejs',{isAuthenticated:false});
+});
+
 //회원가입 페이지
 app.get("/signup", function (request, response) {
   response.render("sign_up.ejs");

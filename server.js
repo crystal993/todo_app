@@ -14,25 +14,22 @@ const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
 
 // .env 환경 설정에 필요함
-require('dotenv').config();
+require("dotenv").config();
 
 // 패스워드 암호화 bcrypt
 // npm install bcrypt
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 
-MongoClient.connect(
-  process.env.DB_URL,
-  function (에러, client) {
-    //연결되면 할 일
-    if (에러) return console.log(에러);
+MongoClient.connect(process.env.DB_URL, function (에러, client) {
+  //연결되면 할 일
+  if (에러) return console.log(에러);
 
-    db = client.db("todoapp");
+  db = client.db("todoapp");
 
-    app.listen(process.env.PORT, function () {
-      console.log("listening on 8080");
-    });
-  }
-);
+  app.listen(process.env.PORT, function () {
+    console.log("listening on 8080");
+  });
+});
 
 // /pet에 방문하면 관련된 안내문 출력
 app.get("/pet", function (요청, 응답) {
@@ -183,98 +180,127 @@ app.put("/edit", function (요청, 응답) {
 
 // });
 
+//1
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const session = require("express-session");
 
-const passport = require('passport');
-const LocalStrategy = require('passport-local');
-const session = require('express-session');
+//2 - 로그인을 하기 위해서 필요
+app.use(
+  session({ secret: "비밀코드", resave: true, saveUninitialized: false })
+);
 
-app.use(session({secret: '비밀코드', resave : true, saveUninitialized:false}));
+// Passport // 3
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Custom Middlewares // 4
+app.use(function (req, res, next) {
+  res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.currentUser = req.user;
+  next();
+});
 
 //login
-app.get('/login', function(요청, 응답){
-  응답.render('login.ejs');
+app.get("/login", function (요청, 응답) {
+  응답.render("login.ejs");
 });
 
-app.post('/login', passport.authenticate('local',{
-  failureRedirect : '/fail'
-}), function(요청, 응답){
-  응답.redirect('/');
-});
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/fail",
+  }),
+  function (요청, 응답) {
+    응답.redirect("/");
+  }
+);
 
 // 마이페이지에 접속 - 회원만
-app.get('/mypage', loginCheck, function(request,response){
+app.get("/mypage", loginCheck, function (request, response) {
   console.log(request.user);
-  response.render('myPage.ejs', {사용자 : request.user});
-})
+  response.render("myPage.ejs", { 사용자: request.user });
+});
 
 // 로그인 여부 체크
-function loginCheck(request, response, next){
-  if(request.user){
+function loginCheck(request, response, next) {
+  if (request.user) {
     //request.user가 있으면 next() 통과
     next();
   } else {
     //request.user가 없으면 경고메세지
-    response.send('로그인 안 하셨는데요??');
+    response.send("로그인 안 하셨는데요??");
   }
 }
 
-
-
-// 아이디/비번 DB와 맞는지 비교 
+// 아이디/비번 DB와 맞는지 비교
 // LocalStrategy 인증 방식
-passport.use(new LocalStrategy({
-  usernameField: 'id',
-  passwordField: 'pw',
-  session: true, // 세션에 저장하는지 여부
-  passReqToCallback: false, // 아이디/비번 말고도 다른 정보 검증시에 true
-}, function (입력한아이디, 입력한비번, done) {
-  // 이 부분은 아이디와 비밀번호를 검증하는 부분
-  // console.log(입력한아이디, 입력한비번);
-  db.collection('login').findOne({ id: 입력한아이디 }, function (에러, 결과) {
-    if (에러) return done(에러)
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "id",
+      passwordField: "pw",
+      session: true, // 세션에 저장하는지 여부
+      passReqToCallback: false, // 아이디/비번 말고도 다른 정보 검증시에 true
+    },
+    function (입력한아이디, 입력한비번, done) {
+      // 이 부분은 아이디와 비밀번호를 검증하는 부분
+      // console.log(입력한아이디, 입력한비번);
+      db.collection("login").findOne(
+        { id: 입력한아이디 },
+        function (에러, 결과) {
+          if (에러) return done(에러);
 
-    if (!결과) return done(null, false, { message: '존재하지않는 아이디요' })
+          if (!결과)
+            return done(null, false, { message: "존재하지않는 아이디요" });
 
-    if (bcrypt.compareSync(입력한비번,결과.pw)) {
-      return done(null, 결과);
-    } else {
-      return done(null, false, { message: '비번틀렸어요' });
+          //console.log(bcrypt.compareSync(입력한비번,결과.pw));   : 암호화한 pw와 입력한 비번 비교
+          if (bcrypt.compareSync(입력한비번, 결과.pw)) {
+            return done(null, 결과);
+          } else {
+            return done(null, false, { message: "비번틀렸어요" });
+          }
+        }
+      );
     }
-  })
-}));
+  )
+);
 
-//세션 만들고 세션아이디 발급해서 쿠키로 보내주기 
+//세션 만들고 세션아이디 발급해서 쿠키로 보내주기
 passport.serializeUser(function (user, done) {
-  done(null, user.id)
+  done(null, user.id);
 });
 
 //로그인한 유저의 개인 정보를 db에서 찾는 역할
 passport.deserializeUser(function (아이디, done) {
-  //db에서 위에 있는 user.id를 유저를 찾은 뒤에 유저정보를 
+  //db에서 위에 있는 user.id를 유저를 찾은 뒤에 유저정보를
   // done(null, {여기에 넣는다})
-  db.collection('login').findOne({id : 아이디}, function(에러, 결과){
-    done(null,결과)
-  })
-}); 
+  db.collection("login").findOne({ id: 아이디 }, function (에러, 결과) {
+    done(null, 결과);
+  });
+});
 
-
-//회원가입 페이지 
-app.get('/signup', function(request,response){
-  response.render('sign_up.ejs');
+//회원가입 페이지
+app.get("/signup", function (request, response) {
+  response.render("sign_up.ejs");
 });
 
 //회원가입
-app.post('/signup',function(request,response){
+app.post("/signup", function (request, response) {
+  // 패스워드 암호화
+  let encryptedPassowrd = bcrypt.hashSync(request.body.pw, 10); // sync, hashSync
 
-  let encryptedPassowrd = bcrypt.hashSync(request.body.pw, 10) // sync, hashSync
-
-  db.collection('login').insertOne({id : request.body.id, pw:encryptedPassowrd, address:request.body.address },function(error, result){
-    // console.log('id:',request.body.id);
-    // console.log('pw:',request.body.pw);
-    // console.log('address:',request.body.address);
-    response.render('login.ejs');  
-  });
+  db.collection("login").insertOne(
+    {
+      id: request.body.id,
+      pw: encryptedPassowrd,
+      address: request.body.address,
+    },
+    function (error, result) {
+      // console.log('id:',request.body.id);
+      // console.log('pw:',request.body.pw);
+      // console.log('address:',request.body.address);
+      response.render("login.ejs");
+    }
+  );
 });

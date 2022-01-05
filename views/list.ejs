@@ -57,7 +57,7 @@
           <p>Date: <%= posts[i].날짜 %> </p>
           
           <button id="delete" data-id="<%= posts[i]._id %>" type="button" class="btn btn-danger" >삭제</button>
-          <button id="edit" data-id="<%= posts[i]._id %>" type="button" class="btn btn-info" >수정</button>
+          <button id="edit" onClick="location.href='edit/<%= posts[i]._id %>'" type="button" class="btn btn-info" >수정</button>
         </li>
       <% } %>
    </div>

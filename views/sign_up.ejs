@@ -41,11 +41,15 @@
       <form class="row g-3" action="/signup" method="POST">
         <div class="col-md-6">
             <label for="inputEmail4" class="form-label">Email</label>
-            <input type="email" class="form-control" id="id" name="id" placeholder="xxx@gmail.com">
+            <input type="email" class="form-control" id="id" name="id" 
+            placeholder="xxx@gmail.com">
+            <p id="id-alert"></p>
           </div>
           <div class="col-md-6">
             <label for="inputPassword4" class="form-label">Password</label>
-            <input type="password" class="form-control" id="pw" name="pw" placeholder="영문대소문자,숫자 6~20자리 이내로 입력바랍니다.">
+            <input type="password" class="form-control" id="pw" name="pw" 
+            placeholder="영문대소문자,숫자 6~20자리 이내로 입력바랍니다." onClick="pwChk();">
+            <p id="pw-alert"></p>
           </div>
           <div class="col-12 mt-4 mb-4">
             <label for="inputAddress" class="form-label">Address</label>
@@ -56,6 +60,46 @@
           </div>
         </form>
     </div>
+
+    <!-- 아이디 비밀번호 검증 -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <script>
+
+          // 1. 아이디 빈칸 검사하기 
+          // 변수에 저장해서 쓰는 게 훨씬 나음.
+          // $('#email-alert') 찾는데 시간이 오래걸리므로 
+          let emailAlert = $('#id-alert');
+          let pwAlert = $('#pw-alert');
+          
+          // id & pw 빈칸 검사
+          $('form').on('submit', function(e){
+              
+              // 만약에 이메일 input에 입력된 값이 빈칸인 경우, 폼의 전송을 막음
+              if($('#id').val() == ''){
+                //폼의 전송을 막는다.
+                e.preventDefault();
+                //안내문 띄움. 
+                emailAlert.text('아이디가 빈칸입니다.');
+                emailAlert.css('color','skyblue');
+              } 
+              
+              if($('#pw').val() == ''){
+                //폼의 전송을 막는다.
+                e.preventDefault();
+                //안내문 띄움. 
+                pwAlert.text('패스워드가 빈칸입니다.');
+                pwAlert.css('color','skyblue');
+              }
+
+              
+             
+          })
+
+
+
+    </script> 
+
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->

@@ -160,7 +160,7 @@ app.get("/write", function (요청, 응답) {
 app.post("/add", function (요청, 응답) {
   // 참고 : 응답.send()이 부분은 없으면 브라우저 멈춤
   // 실패하든 성공하든 무조건 무언가 보내줘야 함.
-  
+  응답.send("등록 성공");
   console.log(요청.body.title);
   console.log(요청.body.date);
 
@@ -170,7 +170,7 @@ app.post("/add", function (요청, 응답) {
     function (에러, 결과) {
       console.log(결과.totalPost);
       var 총게시물갯수 = 결과.totalPost;
-      응답.render("list.ejs", { posts: 결과, isAuthenticated:요청.isAuthenticated() });
+      
 
       //2. db에 todo id,제목,날짜 저장
       db.collection("post").insertOne(
@@ -216,6 +216,7 @@ app.delete("/delete", function (요청, 응답) {
 
   // 문자열을 숫자로 변환
   요청.body._id = parseInt(요청.body._id);
+
 
   // 삭제
   db.collection("post").deleteOne(요청.body, function (에러, 결과) {
@@ -317,4 +318,16 @@ app.post("/signup", function (request, response) {
       response.render("login.ejs", { isAuthenticated:request.isAuthenticated()});
     }
   );
+});
+
+// 검색 기능
+app.get('/search', (request, response) => {
+  // 1. 요청한 정보가 다 담겨 있다.
+  // request.query : { value: '리액트' }
+  // console.log(request.query.value);
+  // 요청 받으면 '이닦기'라는 제목 가진 게시물을 db에서 찾아서 보내준다.
+  db.collection('post').find({제목:request.query.value}).toArray((error,result)=>{
+    // console.log(result);
+    response.render('serchResult.ejs', {posts:result});
+  });
 });

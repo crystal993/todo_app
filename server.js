@@ -171,10 +171,11 @@ app.post("/add", function (요청, 응답) {
       console.log(결과.totalPost);
       var 총게시물갯수 = 결과.totalPost;
       
+      var posts =  { _id: 총게시물갯수 + 1, 작성자: 요청.user.id, 제목: 요청.body.title, 날짜: 요청.body.date  };
 
       //2. db에 todo id,제목,날짜 저장
       db.collection("post").insertOne(
-        { _id: 총게시물갯수 + 1, 제목: 요청.body.title, 날짜: 요청.body.date },
+        posts,
         function (에러, 결과) {
           console.log("DB에 저장완료");
 
@@ -302,7 +303,9 @@ app.get("/signup", function (request, response) {
 
 //회원가입
 app.post("/signup", function (request, response) {
-  // 패스워드 암호화
+  //1. 저장 전에 아이디 중복 되는지 
+  //2. 아이디 형식이 맞는지 
+  //3. 패스워드 암호화 bcrypt.hashSync
   let encryptedPassowrd = bcrypt.hashSync(request.body.pw, 10); // sync, hashSync
 
   db.collection("login").insertOne(

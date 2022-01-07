@@ -322,11 +322,24 @@ app.post("/signup", function (request, response) {
 
 // 검색 기능
 app.get('/search', (request, response) => {
-  // 1. 요청한 정보가 다 담겨 있다.
-  // request.query : { value: '리액트' }
-  // console.log(request.query.value);
-  // 요청 받으면 '이닦기'라는 제목 가진 게시물을 db에서 찾아서 보내준다.
-  db.collection('post').find({ $text: { $search: request.query.value }}).toArray((error,result)=>{
+  
+  // mongo DB에서 생성한 SERACH INDEX 에서 찾을 검색조건 
+  var searchCondition = [
+    {
+      $search: {
+        index: 'titleSearch',
+        text: {
+          query: request.query.value,
+          path: '제목'  // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+        }
+      }
+    },
+    { $sort : { _id : -1} }, // id 1은 오름차순, -1은 내림차순
+    { $limit : 10 //상위 10개만 가져옴
+    } 
+] 
+
+  db.collection('post').aggregate(searchCondition).toArray((error,result)=>{
     console.log(result);
     response.render('serchResult.ejs', { posts: result });
   });

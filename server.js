@@ -46,9 +46,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Custom Middlewares // 4 - 로그인
-app.use(function (req, res, next) {
-  res.locals.isAuthenticated = req.isAuthenticated();
-  res.locals.currentUser = req.user;
+// 로그인한 회원의 접근 권한을 주기 위한 변수 
+// 전역변수로 선언
+app.use(function (request, response, next) {
+  response.locals.isAuthenticated = request.isAuthenticated();
+  response.locals.currentUser = request.user;
   next();
 });
 
@@ -64,6 +66,7 @@ app.post(
     failureRedirect: "/fail",
   }),
   function (요청, 응답) {
+    console.log(요청.user._id);
     응답.render('index.ejs',{isAuthenticated:요청.isAuthenticated()});
   }
 );
@@ -205,9 +208,11 @@ app.get("/list", function (요청, 응답) {
     .find()
     .toArray(function (에러, 결과) {
       console.log(결과);
+      // console.log(요청.body._id); 
+      // console.log(결과[0].작성자); 
 
       // 2. 결과라는 데이터를 posts 라는 이름으로 list.ejs 파일에 보낸다.
-      응답.render("list.ejs", { posts: 결과, isAuthenticated:요청.isAuthenticated() });
+      응답.render("list.ejs", { posts: 결과});
     });
 });
 
@@ -218,9 +223,11 @@ app.delete("/delete", function (요청, 응답) {
   // 문자열을 숫자로 변환
   요청.body._id = parseInt(요청.body._id);
 
+  // 삭제할 데이터
+  var removeData = { _id : 요청.body._id, 작성자 : 요청.user._id}
 
   // 삭제
-  db.collection("post").deleteOne(요청.body, function (에러, 결과) {
+  db.collection("post").deleteOne(removeData, function (에러, 결과) {
     console.log("삭제완료");
     if(에러) {console.log(에러);}
     //응답코드가 성공하면 200
@@ -298,7 +305,7 @@ app.put("/edit", function (요청, 응답) {
 
 //회원가입 페이지
 app.get("/signup", function (request, response) {
-  response.render("sign_up.ejs", { isAuthenticated:request.isAuthenticated()});
+  response.render("sign_up.ejs");
 });
 
 //회원가입
@@ -318,7 +325,7 @@ app.post("/signup", function (request, response) {
       // console.log('id:',request.body.id);
       // console.log('pw:',request.body.pw);
       // console.log('address:',request.body.address);
-      response.render("login.ejs", { isAuthenticated:request.isAuthenticated()});
+      response.redirect("/login");
     }
   );
 });

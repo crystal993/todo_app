@@ -326,8 +326,8 @@ app.get('/search', (request, response) => {
   // request.query : { value: '리액트' }
   // console.log(request.query.value);
   // 요청 받으면 '이닦기'라는 제목 가진 게시물을 db에서 찾아서 보내준다.
-  db.collection('post').find({제목:request.query.value}).toArray((error,result)=>{
-    // console.log(result);
-    response.render('serchResult.ejs', {posts:result});
+  db.collection('post').find({ $text: { $search: request.query.value }}).toArray((error,result)=>{
+    console.log(result);
+    response.render('serchResult.ejs', { posts: result });
   });
 });

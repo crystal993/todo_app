@@ -53,73 +53,65 @@
 
     <!-- 서버에서 가져온 할 일 리스트 -->
 
-    <!-- <% for (var i = 0; i < posts.length; i++ ){ %>
-    <div>
-        <h4>할일 제목: <%= posts[i].제목 %> </h4>
-        <p>마감 날짜: <%= posts[i].날짜 %> </p>
-        <button>삭제</button>
-    </div>
-    <% } %>  -->
-
     <div class="container">
-      <% for (var i = 0; i < posts.length; i++ ){ %>
-      <li class="list-group-item">
-        <h4>
-          <a href="/detail/<%= posts[i]._id %>" style="text-decoration: none">
-            할 일 : <%= posts[i].제목 %></a
+        <% for (var i = 0; i < posts.length; i++ ){ %>
+        <li class="list-group-item">
+          <h4>
+            <a href="/detail/<%= posts[i]._id %>" style="text-decoration: none">
+              할 일 : <%= posts[i].제목 %></a
+            >
+          </h4>
+  
+          <p>Date: <%= posts[i].날짜 %></p>
+  
+          <button
+            id="delete"
+            data-id="<%= posts[i]._id %>"
+            type="button"
+            class="delete btn btn-danger"
           >
-        </h4>
-
-        <p>Date: <%= posts[i].날짜 %></p>
-
-        <button
-          id="delete"
-          data-id="<%= posts[i]._id %>"
-          type="button"
-          class="delete btn btn-danger"
-        >
-          삭제
-        </button>
-        <button
-          id="edit"
-          onClick="location.href='edit/<%= posts[i]._id %>'"
-          type="button"
-          class="btn btn-info"
-        >
-          수정
-        </button>
-      </li>
-      <% } %>
-    </div>
-
-    
-
-    <script>
-      //삭제기능
-      // #delete에서 .delete로 변경 => 아이디는 한 요소만 삭제가능
-      $(".delete").click(function (e) {
-        // 글번호 data-id에 저장된 요소를 가져오기
-        var 글번호 = e.target.dataset.id;
-        var 지금누른거 = $(this);
-
-        $.ajax({
-          method: "DELETE",
-          url: "/delete/",
-          data: { _id: 글번호 },
-        })
-          .done(function (결과) {
-            //AJAX 성공
-            //1. 페이지를 새로고침
-            //2. 삭제버튼 누른 <li> 요소를 제거하거나 안 보이도록
-            console.log("삭제 성공");
-            지금누른거.parent("li").fadeOut();
+            삭제
+          </button>
+          <button
+            id="edit"
+            onClick="location.href='edit/<%= posts[i]._id %>'"
+            type="button"
+            class="btn btn-info"
+          >
+            수정
+          </button>
+        </li>
+        <% } %>
+      </div>
+  
+      
+  
+      <script>
+        //삭제기능
+        // #delete에서 .delete로 변경 => 아이디는 한 요소만 삭제가능
+        $(".delete").click(function (e) {
+          // 글번호 data-id에 저장된 요소를 가져오기
+          var 글번호 = e.target.dataset.id;
+          var 지금누른거 = $(this);
+  
+          $.ajax({
+            method: "DELETE",
+            url: "/delete/",
+            data: { _id: 글번호 },
           })
-          .fail(function (xhr, textStatus, errorThrown) {
-            //AJAX 실패
-            console.log(xhr, textStatus, errorThrown);
-          });
-      });
-    </script>
+            .done(function (결과) {
+              //AJAX 성공
+              //1. 페이지를 새로고침
+              //2. 삭제버튼 누른 <li> 요소를 제거하거나 안 보이도록
+              console.log("삭제 성공");
+              지금누른거.parent("li").fadeOut();
+            })
+            .fail(function (xhr, textStatus, errorThrown) {
+              //AJAX 실패
+              console.log(xhr, textStatus, errorThrown);
+            });
+        });
+      </script>
 
     <!-- Optional JavaScript; choose one of the two! -->
 

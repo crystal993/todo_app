@@ -35,6 +35,7 @@ MongoClient.connect(process.env.DB_URL, function (에러, client) {
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
+const { request } = require("express");
 
 //2 - 로그인을 하기 위해서 필요
 app.use(
@@ -309,16 +310,20 @@ app.get("/signup", function (request, response) {
 });
 
 //회원가입 기능
-app.get("/signup", function (request, response) {
-  //1. 저장 전에 아이디 중복 되는지 
-  //2. 아이디 형식이 맞는지 
-  //3. 패스워드 암호화 bcrypt.hashSync
+app.post("/signup", function (request, response) {
+  //1. 저장 전에 아이디 중복 되는지 - 완
+  //2. 아이디 형식이 맞는지 - 완
+  //3. 패스워드 암호화 bcrypt.hashSync - 완
   let encryptedPassowrd = bcrypt.hashSync(request.body.pw, 10); // sync, hashSync
+
+  //phone
+  let userPhone = String(request.body.telno1) + String(request.body.telno2) + String(request.body.telno3);
 
   db.collection("login").insertOne(
     {
       id: request.body.id,
-      pw: encryptedPassowrd
+      pw: encryptedPassowrd,
+      phone : userPhone
     },
     function (error, result) {
       // console.log('id:',request.body.id);
@@ -331,18 +336,15 @@ app.get("/signup", function (request, response) {
 
 //아이디 중복 체크
 app.get('/idCheck', (request,response) => {
-  // console.log(request.query);
+  console.log(request.query.id);
 
   //db에 동일한 아이디 존재하는지 찾기
-  db.collection("login").find({id: { $eq: request.query.id}}, function(error,result){
-    if(error){
-      console.log(error);
-      return response.status(400).send({message : ""})
-    } else {
-      //응답코드가 성공하면 200
-      // console.log(result);
-      return response.status(200).send({ message: "동일한 아이디가 존재합니다."});
-    }
+  db.collection("login").findOne({id: request.query.id}, function(error,result){
+    if(error){ console.log(error);}
+
+    if(result) {
+      return response.status(200).send({id: result.id, message: "동일한 아이디가 존재합니다."});
+    } 
   })
 })
 

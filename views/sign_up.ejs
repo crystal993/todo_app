@@ -49,11 +49,11 @@
           </div>
           <div class="col-md-12" >
             <label for="inputPhone" class="telno form-label">Phone</label><br>
-            <input type="text" class="form-control" id="telno1" name="telno" style="display: inline; width:30%;">
+            <input type="text" class="form-control" id="telno1" name="telno1" style="display: inline; width:30%;">
             <label for="inputPhone" class="telno form-label">-</label>
-            <input type="text" class="form-control" id="telno2" name="telno"  style="display: inline; width:30%;">
+            <input type="text" class="form-control" id="telno2" name="telno2"  style="display: inline; width:30%;">
             <label for="inputPhone" class="telno form-label">-</label>
-            <input type="text" class="form-control" id="telno3" name="telno"  style="display: inline; width:30%;">
+            <input type="text" class="form-control" id="telno3" name="telno3"  style="display: inline; width:30%;">
             <p id="tel-alert"></p>
           </div>
           <div class="col-md-12">
@@ -101,45 +101,52 @@
             
             // $('#id').val() :여기다가 넣어줘야 실시간으로 검증 가능
             if (!emailRegExp.test($('#id').val())){
-                //폼의 전송을 막는다.
-                e.preventDefault();
-                //안내문 띄움.
-                emailAlert.css('color','skyblue'); 
-                emailAlert.text('영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.');
-                check = false;
-              } else {
-                  //id(이메일) 중복체크
-                  $('#id').on('focusout',function(e){
-                    let userId = $(id).val();
-
-                    $.ajax({
-                      method: "GET",
-                      url: "/idCheck/",
-                      contentType: "application/json",
-                      data: { id: userId },
-                    })
-                      .done(function (result) {
-                        //AJAX 성공
-                        if(typeof result.id != "undefined"){
-                          //중복된 아이디가 존재하면
-                          emailAlert.css('color','skyblue');
-                          emailAlert.text(result.message);
-                          check = false;
-                        } else {
-                          //새로운 아이디일 경우
-                          emailAlert.css('color','green'); 
-                          emailAlert.text('멋진 아이디네요!');
-                          check = true;
-                        }
-                      })
-                      .fail(function (xhr, textStatus, errorThrown) {
-                        //AJAX 실패
-                        console.log(xhr, textStatus, errorThrown);
-                      });
-                  });
-              }  
+              //폼의 전송을 막는다.
+              e.preventDefault();
+              //안내문 띄움.
+              emailAlert.css('color','skyblue'); 
+              emailAlert.text('영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.');
+              check = false;
+            } else {
+              //안내문 띄움.
+              emailAlert.css('color','green'); 
+              emailAlert.text('');
+              check = false;
+            }
           });
 
+          //id(이메일) 중복체크
+          $('#id').on('focusout',function(e){
+              let userId = $(id).val();
+
+              $.ajax({
+                method: "GET",
+                url: "/idCheck/",
+                contentType: "application/json",
+                data: { id: userId },
+              })
+              .done(function (result) {
+
+                //AJAX 성공
+                if(result.id == userId){
+                  //중복된 아이디가 존재하면
+                  emailAlert.css('color','skyblue');
+                  emailAlert.text(result.message);
+                  check = false;
+                } else {
+                  //새로운 아이디일 경우
+                  emailAlert.css('color','green'); 
+                  emailAlert.text('멋진 아이디네요!');
+                  check = true;
+                }
+              })
+              .fail(function (xhr, textStatus, errorThrown) {
+                //AJAX 실패
+                console.log(xhr, textStatus, errorThrown);
+              });
+            });
+
+          
 
           // pw(패스워드 형식 검증)
           $('#pw').on('input', function(e){

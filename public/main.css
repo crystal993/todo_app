@@ -8,3 +8,8 @@ a,
 label {
   font-family: "Gowun Batang", serif;
 }
+
+form.center{
+  margin-left: auto;
+  margin-right: auto;
+}

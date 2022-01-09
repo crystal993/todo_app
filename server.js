@@ -318,8 +318,7 @@ app.post("/signup", function (request, response) {
   db.collection("login").insertOne(
     {
       id: request.body.id,
-      pw: encryptedPassowrd,
-      address: request.body.address,
+      pw: encryptedPassowrd
     },
     function (error, result) {
       // console.log('id:',request.body.id);

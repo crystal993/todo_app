@@ -37,14 +37,36 @@
 
     <h4 class="container mt-4">Sign Up</h4>
 
-    <div class="container mt-3">
-      <form class="row g-3" action="/signup" method="POST">
+    <div class="container mt-3 col-md-6">
+      <form class="row g-3 center" action="/signup" method="POST">
         <div class="col-md-6">
             <label for="inputEmail4" class="form-label">Email</label>
             <input type="text" class="form-control" id="id" name="id" 
             placeholder="xxx@gmail.com">
             <p id="id-alert"></p>
           </div>
+          <!-- <div class="col-6 mt-4 mb-4">
+            <label for="inputPhone" class="form-label">Phone</label>
+            <div class="form-group row">
+              <div class="col-md-2 col-xs-3 ml-2">
+                <select class="selectpicker" id="telno1" name="telno1" >
+                  <option value="010">010</option>
+                  <option value="011">011</option>
+                  <option value="016">016</option>
+                  <option value="017">017</option>
+                  <option value="018">018</option>
+                  <option value="019">019</option>
+                </select>
+              </div>
+              <label for="inputPhone" class="form-label">-</label>
+              <div class="col-xs-2">
+                <input type="text" class="form-control" id="telno2" name="telno2">
+              </div>
+              <div class="col-xs-2">
+                <input type="text" class="form-control" id="telno3" name="telno3">
+              </div>
+           </div>
+          </div> -->
           <div class="col-md-6">
             <label for="inputPassword4" class="form-label">Password</label>
             <input type="password" class="form-control" id="pw" name="pw" 
@@ -56,10 +78,6 @@
             <input type="password" class="form-control" id="pw2" name="pw2" 
             placeholder="영문대소문자,숫자 6~20자리 이내로 입력바랍니다.">
             <p id="pw-alert2"></p>
-          </div>
-          <div class="col-12 mt-4 mb-4">
-            <label for="inputAddress" class="form-label">Address</label>
-            <input type="text" class="form-control" id="address" name="address" placeholder="1234 Main St">
           </div>
           <div class="col-12">
             <button type="submit" class="btn btn-primary">Sign in</button>
@@ -87,6 +105,9 @@
           let pwRegExp = /^.*(?=.{8,16})(?=.*[0-9])(?=.*[a-zA-Z]).*$/; //8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.
           let phoneRegExp = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
 
+          // 가입여부 체크 
+          let check = false;
+
           // id(이메일 형식 검증) 
           $('#id').on('input', function(e){
             
@@ -97,9 +118,11 @@
                 //안내문 띄움.
                 emailAlert.css('color','skyblue'); 
                 emailAlert.text('영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.');
+                check = false;
               } else {
                 emailAlert.css('color','green'); 
                 emailAlert.text('멋진 아이디네요!');
+                check = true;
               }  
 
                
@@ -114,27 +137,29 @@
                 //안내문 띄움. 
                 pwAlert.css('color','skyblue');
                 pwAlert.text('8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.')
-
+                check = false;
               } else {
+                //폼의 전송을 막는다.
+                e.preventDefault();
                 //안내문 띄움. 
                 pwAlert.css('color','green');
                 pwAlert.text('안전한 비밀번호 입니다.');
-                let pw = $('#pw').val();
                 
                 // pw2(패스워드 형식 검증) - 위의 입력폼과 일치하는지 
                 $('#pw2').on('input', function(e){
                     
-                    if (pw != $('#pw2').val()){
+                    if ($('#pw').val() != $('#pw2').val()){
                         //폼의 전송을 막는다.
                         e.preventDefault();
                         //안내문 띄움. 
                         pwAlert2.css('color','skyblue');
                         pwAlert2.text('비밀번호가 일치하지 않습니다.')
-        
+                        check = false;
                       } else {
                         //안내문 띄움. 
                         pwAlert2.css('color','green');
                         pwAlert2.text('비밀번호가 일치합니다.')
+                        check = true;
                       }
         
                   })
@@ -142,19 +167,18 @@
 
           })
           
-          
 
-          // id & pw 빈칸 검사 - 폼의 전송을 막는다.
+          // 회원가입 폼 빈칸 검사 - 폼의 전송을 막는다.
           $('form').on('submit', function(e){
             
               // id가 공백일 때 
-              if(id == ''){
+              if($('#id').val() == ''){
                 //폼의 전송을 막는다.
                 e.preventDefault();
                //안내문 띄움.
                emailAlert.css('color','skyblue'); 
                emailAlert.text('필수정보입니다.');
-              
+               check = false;
               } 
 
               // pw가 공백일 때 
@@ -164,9 +188,28 @@
                 //안내문 띄움.
                 pwAlert.css('color','skyblue'); 
                 pwAlert.text('필수정보입니다.');
+                check = false;
+              }
 
+              // pw가 공백일 때 
+              if($('#pw2').val() == ''){
+                //폼의 전송을 막는다.
+                e.preventDefault();
+                //안내문 띄움.
+                pwAlert2.css('color','skyblue'); 
+                pwAlert2.text('필수정보입니다.');
+                check = false;
               }
               
+              // 유효성 검증
+              if(check){
+                //비동기 처리이벤트
+                setTimeout(function() {
+                alert("가입이 완료되었습니다.")
+                },0);
+              } else {
+                e.preventDefault();
+              }
              
           })
 

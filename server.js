@@ -334,11 +334,15 @@ app.get('/idCheck', (request,response) => {
   // console.log(request.query);
 
   //db에 동일한 아이디 존재하는지 찾기
-  db.collection("login").findOne({id: request.query.id}, function(error,result){
-    if(error){console.log(error);}
-    //응답코드가 성공하면 200
-    // console.log(result);
-    response.status(200).send({ message: "동일한 아이디가 존재합니다."});
+  db.collection("login").find({id: { $eq: request.query.id}}, function(error,result){
+    if(error){
+      console.log(error);
+      return response.status(400).send({message : ""})
+    } else {
+      //응답코드가 성공하면 200
+      // console.log(result);
+      return response.status(200).send({ message: "동일한 아이디가 존재합니다."});
+    }
   })
 })
 

@@ -41,47 +41,34 @@
 
     <div class="container mt-3 col-md-6">
       <form class="row g-3 center" action="/signup" method="POST">
-        <div class="col-md-6">
+          <div class="col-md-12">
             <label for="inputEmail4" class="form-label">Email</label>
             <input type="text" class="form-control" id="id" name="id" 
             placeholder="xxx@gmail.com">
             <p id="id-alert"></p>
           </div>
-          <!-- <div class="col-6 mt-4 mb-4">
-            <label for="inputPhone" class="form-label">Phone</label>
-            <div class="form-group row">
-              <div class="col-md-2 col-xs-3 ml-2">
-                <select class="selectpicker" id="telno1" name="telno1" >
-                  <option value="010">010</option>
-                  <option value="011">011</option>
-                  <option value="016">016</option>
-                  <option value="017">017</option>
-                  <option value="018">018</option>
-                  <option value="019">019</option>
-                </select>
-              </div>
-              <label for="inputPhone" class="form-label">-</label>
-              <div class="col-xs-2">
-                <input type="text" class="form-control" id="telno2" name="telno2">
-              </div>
-              <div class="col-xs-2">
-                <input type="text" class="form-control" id="telno3" name="telno3">
-              </div>
-           </div>
-          </div> -->
-          <div class="col-md-6">
+          <div class="col-md-12" >
+            <label for="inputPhone" class="telno form-label">Phone</label><br>
+            <input type="text" class="form-control" id="telno1" name="telno" style="display: inline; width:30%;">
+            <label for="inputPhone" class="telno form-label">-</label>
+            <input type="text" class="form-control" id="telno2" name="telno"  style="display: inline; width:30%;">
+            <label for="inputPhone" class="telno form-label">-</label>
+            <input type="text" class="form-control" id="telno3" name="telno"  style="display: inline; width:30%;">
+            <p id="tel-alert"></p>
+          </div>
+          <div class="col-md-12">
             <label for="inputPassword4" class="form-label">Password</label>
             <input type="password" class="form-control" id="pw" name="pw" 
             placeholder="영문대소문자,숫자 6~20자리 이내로 입력바랍니다.">
             <p id="pw-alert"></p>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-12">
             <label for="inputPassword4" class="form-label">Reconfirm Password</label>
             <input type="password" class="form-control" id="pw2" name="pw2" 
             placeholder="영문대소문자,숫자 6~20자리 이내로 입력바랍니다.">
             <p id="pw-alert2"></p>
           </div>
-          <div class="col-12">
+          <div class="col-12 mt-3">
             <button type="submit" class="btn btn-primary">Sign in</button>
           </div>
         </form>
@@ -95,15 +82,16 @@
           let id = $('#id');
           let pw = $('#pw');
    
-          // id, pw 경고문 p태그 
+          // id, pw, tel 경고문 p태그 
           let emailAlert = $('#id-alert');
           let pwAlert = $('#pw-alert');
           let pwAlert2 = $('#pw-alert2');
+          let telAlert = $('#tel-alert');
 
           // id, pw 정규식
           let emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i; //영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.
           let pwRegExp = /^.*(?=.{8,16})(?=.*[0-9])(?=.*[a-zA-Z]).*$/; //8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.
-          let phoneRegExp = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
+          let telRegExp = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
 
           // 가입여부 체크 
           let check = false;
@@ -120,42 +108,36 @@
                 emailAlert.text('영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.');
                 check = false;
               } else {
-                emailAlert.css('color','green'); 
-                emailAlert.text('멋진 아이디네요!');
-                check = true;
+                  //id(이메일) 중복체크
+                  $('#id').on('focusout',function(e){
+                    let userId = $(id).val();
+
+                    $.ajax({
+                      method: "GET",
+                      url: "/idCheck/",
+                      contentType: "application/json",
+                      data: { id: userId },
+                    })
+                      .done(function (result) {
+                        //AJAX 성공
+                        if(typeof result.id != "undefined"){
+                          //중복된 아이디가 존재하면
+                          emailAlert.css('color','skyblue');
+                          emailAlert.text(result.message);
+                          check = false;
+                        } else {
+                          //새로운 아이디일 경우
+                          emailAlert.css('color','green'); 
+                          emailAlert.text('멋진 아이디네요!');
+                          check = true;
+                        }
+                      })
+                      .fail(function (xhr, textStatus, errorThrown) {
+                        //AJAX 실패
+                        console.log(xhr, textStatus, errorThrown);
+                      });
+                  });
               }  
-
-               
-          });
-
-          //id(이메일) 중복체크
-          $('#id').on('focusout',function(e){
-            let userId = $(id).val();
-
-            $.ajax({
-              method: "GET",
-              url: "/idCheck/",
-              contentType: "application/json",
-              data: { id: userId },
-            })
-              .done(function (result) {
-                //AJAX 성공
-                if(result){
-                  //중복된 아이디가 존재하면
-                  emailAlert.css('color','skyblue');
-                  emailAlert.text(result.message);
-                  check = false;
-                } else {
-                  //새로운 아이디일 경우
-                  emailAlert.css('color','green'); 
-                  emailAlert.text('멋진 아이디네요!');
-                  check = true;
-                }
-              })
-              .fail(function (xhr, textStatus, errorThrown) {
-                //AJAX 실패
-                console.log(xhr, textStatus, errorThrown);
-              });
           });
 
 
@@ -197,7 +179,48 @@
               }
 
           })
-          
+
+          // phone 형식 검증
+          $("#telno1").on('focusout', function(e){
+            //  console.log($('#telno1').val());
+             let tel = $('#telno1').val();
+             if (tel.length != 3) {
+                //폼의 전송을 막는다.
+                e.preventDefault();
+                telAlert.css('color','skyblue');
+                telAlert.text('휴대폰번호를 정확히 입력해주세요.');
+                check = false;
+             }
+             
+             $("#telno2").on('focusout', function(e){
+                // console.log($('#telno2').val());
+                tel = tel + String($('#telno2').val());
+                if (tel.length != 7) {
+                    //폼의 전송을 막는다.
+                    e.preventDefault();
+                    telAlert.css('color','skyblue');
+                    telAlert.text('휴대폰번호를 정확히 입력해주세요.');
+                    check = false;
+                }
+
+                $("#telno3").on('focusout', function(e){
+                  // console.log($('#telno3').val());
+                  tel = tel + String($('#telno3').val());
+                  
+                  if(!telRegExp.test(tel) && tel.length != 11){
+                    //폼의 전송을 막는다.
+                    e.preventDefault();
+                    telAlert.css('color','skyblue');
+                    telAlert.text('휴대폰번호를 정확히 입력해주세요.');
+                    check = false;
+                  } else {
+                    telAlert.css('color','green');
+                    telAlert.text('올바른 전화번호 양식입니다.');
+                    check = true;
+                  }
+              })
+            })
+          })
 
           // 회원가입 폼 빈칸 검사 - 폼의 전송을 막는다.
           $('form').on('submit', function(e){
@@ -222,13 +245,23 @@
                 check = false;
               }
 
-              // pw가 공백일 때 
+              // pw2가 공백일 때 
               if($('#pw2').val() == ''){
                 //폼의 전송을 막는다.
                 e.preventDefault();
                 //안내문 띄움.
                 pwAlert2.css('color','skyblue'); 
                 pwAlert2.text('필수정보입니다.');
+                check = false;
+              }
+
+              // telno가 공백일 때 
+              if($('#telNo').val() == ''){
+                //폼의 전송을 막는다.
+                e.preventDefault();
+                //안내문 띄움.
+                telAlert.css('color','skyblue'); 
+                telAlert.text('필수정보입니다.');
                 check = false;
               }
               

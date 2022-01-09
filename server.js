@@ -308,8 +308,8 @@ app.get("/signup", function (request, response) {
   response.render("sign_up.ejs");
 });
 
-//회원가입
-app.post("/signup", function (request, response) {
+//회원가입 기능
+app.get("/signup", function (request, response) {
   //1. 저장 전에 아이디 중복 되는지 
   //2. 아이디 형식이 맞는지 
   //3. 패스워드 암호화 bcrypt.hashSync
@@ -328,6 +328,19 @@ app.post("/signup", function (request, response) {
     }
   );
 });
+
+//아이디 중복 체크
+app.get('/idCheck', (request,response) => {
+  // console.log(request.query);
+
+  //db에 동일한 아이디 존재하는지 찾기
+  db.collection("login").findOne({id: request.query.id}, function(error,result){
+    if(error){console.log(error);}
+    //응답코드가 성공하면 200
+    // console.log(result);
+    response.status(200).send({ message: "동일한 아이디가 존재합니다."});
+  })
+})
 
 // 검색 기능
 app.get('/search', (request, response) => {

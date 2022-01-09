@@ -41,15 +41,21 @@
       <form class="row g-3" action="/signup" method="POST">
         <div class="col-md-6">
             <label for="inputEmail4" class="form-label">Email</label>
-            <input type="email" class="form-control" id="id" name="id" 
+            <input type="text" class="form-control" id="id" name="id" 
             placeholder="xxx@gmail.com">
             <p id="id-alert"></p>
           </div>
           <div class="col-md-6">
             <label for="inputPassword4" class="form-label">Password</label>
             <input type="password" class="form-control" id="pw" name="pw" 
-            placeholder="영문대소문자,숫자 6~20자리 이내로 입력바랍니다." onClick="pwChk();">
+            placeholder="영문대소문자,숫자 6~20자리 이내로 입력바랍니다.">
             <p id="pw-alert"></p>
+          </div>
+          <div class="col-md-6">
+            <label for="inputPassword4" class="form-label">Reconfirm Password</label>
+            <input type="password" class="form-control" id="pw2" name="pw2" 
+            placeholder="영문대소문자,숫자 6~20자리 이내로 입력바랍니다.">
+            <p id="pw-alert2"></p>
           </div>
           <div class="col-12 mt-4 mb-4">
             <label for="inputAddress" class="form-label">Address</label>
@@ -61,37 +67,105 @@
         </form>
     </div>
 
-    <!-- 아이디 비밀번호 검증 -->
+    <!-- 회원 가입 유효성 검증 -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
     <script>
 
-          // 1. 아이디 빈칸 검사하기 
-          // 변수에 저장해서 쓰는 게 훨씬 나음.
-          // $('#email-alert') 찾는데 시간이 오래걸리므로 
+          // // id, pw input에 저장된 값 가져옴.
+          // 주석처리 : 실시간으로 받아오는 게 아니라 에러 떠서
+          // var idValue = $('#id').val();
+          // let pw = $('#pw').val();
+   
+          // id, pw 경고문 p태그 
           let emailAlert = $('#id-alert');
           let pwAlert = $('#pw-alert');
-          
-          // id & pw 빈칸 검사
-          $('form').on('submit', function(e){
+          let pwAlert2 = $('#pw-alert2');
+
+          // id, pw 정규식
+          let emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i; //영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.
+          let pwRegExp = /^.*(?=.{8,16})(?=.*[0-9])(?=.*[a-zA-Z]).*$/; //8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.
+          let phoneRegExp = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
+
+          // id(이메일 형식 검증) 
+          $('#id').on('input', function(e){
+            
+            // $('#id').val() :여기다가 넣어줘야 실시간으로 검증 가능
+            if (!emailRegExp.test($('#id').val())){
+                //폼의 전송을 막는다.
+                e.preventDefault();
+                //안내문 띄움.
+                emailAlert.css('color','skyblue'); 
+                emailAlert.text('영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.');
+              } else {
+                emailAlert.css('color','green'); 
+                emailAlert.text('멋진 아이디네요!');
+              }  
+
+               
+          });         
+
+          // pw(패스워드 형식 검증)
+          $('#pw').on('input', function(e){
               
-              // 만약에 이메일 input에 입력된 값이 빈칸인 경우, 폼의 전송을 막음
-              if($('#id').val() == ''){
+            if (!pwRegExp.test($('#pw').val())){
                 //폼의 전송을 막는다.
                 e.preventDefault();
                 //안내문 띄움. 
-                emailAlert.text('아이디가 빈칸입니다.');
-                emailAlert.css('color','skyblue');
-              } 
+                pwAlert.css('color','skyblue');
+                pwAlert.text('8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.')
+
+              } else {
+                //안내문 띄움. 
+                pwAlert.css('color','green');
+                pwAlert.text('안전한 비밀번호 입니다.');
+                let pw = $('#pw').val();
+                
+                // pw2(패스워드 형식 검증) - 위의 입력폼과 일치하는지 
+                $('#pw2').on('input', function(e){
+                    
+                    if (pw != $('#pw2').val()){
+                        //폼의 전송을 막는다.
+                        e.preventDefault();
+                        //안내문 띄움. 
+                        pwAlert2.css('color','skyblue');
+                        pwAlert2.text('비밀번호가 일치하지 않습니다.')
+        
+                      } else {
+                        //안내문 띄움. 
+                        pwAlert2.css('color','green');
+                        pwAlert2.text('비밀번호가 일치합니다.')
+                      }
+        
+                  })
+              }
+
+          })
+          
+          
+
+          // id & pw 빈칸 검사 - 폼의 전송을 막는다.
+          $('form').on('submit', function(e){
+            
+              // id가 공백일 때 
+              if(id == ''){
+                //폼의 전송을 막는다.
+                e.preventDefault();
+               //안내문 띄움.
+               emailAlert.css('color','skyblue'); 
+               emailAlert.text('필수정보입니다.');
               
+              } 
+
+              // pw가 공백일 때 
               if($('#pw').val() == ''){
                 //폼의 전송을 막는다.
                 e.preventDefault();
-                //안내문 띄움. 
-                pwAlert.text('패스워드가 빈칸입니다.');
-                pwAlert.css('color','skyblue');
-              }
+                //안내문 띄움.
+                pwAlert.css('color','skyblue'); 
+                pwAlert.text('필수정보입니다.');
 
+              }
               
              
           })

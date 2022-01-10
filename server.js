@@ -16,6 +16,8 @@ app.use(methodOverride("_method"));
 // .env 환경 설정에 필요함
 require("dotenv").config();
 
+
+
 MongoClient.connect(process.env.DB_URL, function (error, client) {
   //연결되면 할 일
   if (error) return console.log(error);

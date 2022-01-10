@@ -137,28 +137,10 @@
       //채팅 기능
       $('.userChat').on('click', function(e){
           let member1 = e.target.dataset.id; //채팅 요청 받은 유저
-          let member2 = $("#currentUser").val();//채팅 신청한 유저
-          let dt = new Date();
-          // 오늘 날짜,시간,공백제거
-          let today = dt.toLocaleString().replace(/(\s*)/g, "");
-          let chatName = '채팅방 ['+today+']'
 
-          $.ajax({
-            method:"POST",
-            url:"/chat",
-            data : {
-              member: [member1, member2],
-              date: today,
-              title: chatName
-            }
-          }).done(function (결과) {
-            //AJAX 성공
-            console.log("채팅방 생성");
+          $.post('/chat', {member1: member1}).then(()=>{
+            console.log('성공');
           })
-          .fail(function (xhr, textStatus, errorThrown) {
-            //AJAX 실패
-            console.log(xhr, textStatus, errorThrown);
-          });
       })
     </script>
 

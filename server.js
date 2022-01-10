@@ -41,6 +41,7 @@ app.get("/", function (요청, 응답) {
 //미들웨어 : 요청과 응답사이에 실행되는 코드
 app.use('/shop', require('./routes/shop.js'));
 app.use('/', require('./routes/board.js'));
+app.use('/', require('./routes/chat.js'));
 
 //업로드 페이지로 이동
 app.get('/upload', function(request,response){
@@ -70,3 +71,4 @@ app.post('/upload', upload.single('profile'), function(request, response){
 app.get('/image/:imageName', function(request, response){
   response.sendFile( __dirname + '/public/image' + request.params.imageName);
 });
+

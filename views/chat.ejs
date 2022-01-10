@@ -70,9 +70,20 @@
       <script>
 
         let curChatRoomId;
-        
+        let eventSource;
+
+        // 채팅방 누르면
         $('.list-group-item').click(function(){
           curChatRoomId = this.dataset.id;
+
+          // 서버와 실시간 소통채널 개설 완료
+          // 여기 채널 채팅방 입장
+          eventSource = new EventSource("/message/" + curChatRoomId);
+          
+          // 데이터 수신은 new EventSource('/경로')에 이벤트리스너 부착
+          eventSource.addEventListener('test', function(e){
+            console.log(JSON.parse(e.data));
+          })
         })
         
         $('#send').click((e)=>{

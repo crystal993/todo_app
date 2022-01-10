@@ -1,3 +1,4 @@
+const res = require('express/lib/response');
 const { ObjectId } = require('mongodb');
 var router = require("express").Router();
 
@@ -60,6 +61,22 @@ router.post("/message", loginCheck, function(request, response){
     }).catch(()=>{
 
     })
+})
+
+//서버와 유저간의 실시간 소통채널 열기 
+router.get('/message/:id', loginCheck, function(request, response){
+    response.writeHead(200, {
+        "Connection": "keep-alive",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+      });
+    
+    db.collection("message").find({ parent : request.params.id }).toArray()
+    .then((result)=>{
+        response.write('event: test\n');
+        response.write('data: ' + JSON.stringify(result) +'\n\n');  
+    });  
+
 })
 
 module.exports = router;

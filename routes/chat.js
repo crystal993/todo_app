@@ -14,7 +14,7 @@ function loginCheck(request, response, next) {
   }
 }
 
-//chat목록으로 이동 
+//chat으로 이동 
 router.get("/chat", function(request,response){
     db.collection("chatroom").find({member: request.user._id}).toArray().then((result)=>{
         response.render("chat.ejs", { data : result });
@@ -25,7 +25,7 @@ router.get("/chat", function(request,response){
 router.post("/chat",loginCheck, function(request, response){
     // console.log(request.body);
     let dt = new Date();
-    // 오늘 날짜,시간,공백제거
+    // 오늘 날짜,시간,공백제거    
     let today = dt.toLocaleString().replace(/(\s*)/g, "");
     let chatName = '채팅방 ['+today+']'
     
@@ -37,6 +37,28 @@ router.post("/chat",loginCheck, function(request, response){
 
     db.collection("chatroom").insertOne(chatRoomInfo).then((result)=>{
         response.send('성공');
+    })
+})
+
+//chat 메세지 전송
+router.post("/message", loginCheck, function(request, response){
+    let dt = new Date();
+    // 오늘 날짜,시간,공백제거    
+    let today = dt.toLocaleDateString().replace(/(\s*)/g, "");
+
+    var msgData = {
+        parent : request.body.parent,
+        content : request.body.content,
+        userid : request.user._id,
+        date : today
+    }
+
+    db.collection("message").insertOne(msgData).then((result)=>{
+        // response.render("chat.ejs",{msg:result})
+        console.log("DB저장 성공");
+        response.send("DB저장 성공");
+    }).catch(()=>{
+
     })
 })
 

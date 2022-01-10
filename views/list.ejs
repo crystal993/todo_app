@@ -73,8 +73,9 @@
         <p>Date: <%= posts[i].날짜 %></p>
 
         <!-- 로그인 한 회원이 자신이 작성한 글만 수정,삭제 가능하도록-->
-        <% if (isAuthenticated && currentUser.id == posts[i].작성자 ) { %>
-            <button
+        <% if (isAuthenticated && String(currentUser._id) == String(posts[i].작성자) ) { %>
+  
+          <button
               id="delete"
               data-id="<%= posts[i]._id %>"
               type="button"
@@ -90,9 +91,19 @@
             >
               수정
             </button>
-        <% } %>  
+        <% } else { %>
+          <!-- 채팅하기 버튼 -->
+          <button
+          id="userChat"
+          data-id="<%= posts[i].작성자 %>"
+          type="button"
+          class="userChat btn btn-secondary"
+          >
+           채팅하기
+          </button>
+          <input class="currentUser" type="hidden" value="<%= currentUser._id %>">
       </li>
-      <% } %>
+      <% } } %>
     </div>
 
     
@@ -122,6 +133,33 @@
             console.log(xhr, textStatus, errorThrown);
           });
       });
+
+      //채팅 기능
+      $('.userChat').on('click', function(e){
+          let member1 = e.target.dataset.id; //채팅 요청 받은 유저
+          let member2 = $("#currentUser").val();//채팅 신청한 유저
+          let dt = new Date();
+          // 오늘 날짜,시간,공백제거
+          let today = dt.toLocaleString().replace(/(\s*)/g, "");
+          let chatName = '채팅방 ['+today+']'
+
+          $.ajax({
+            method:"POST",
+            url:"/chat",
+            data : {
+              member: [member1, member2],
+              date: today,
+              title: chatName
+            }
+          }).done(function (결과) {
+            //AJAX 성공
+            console.log("채팅방 생성");
+          })
+          .fail(function (xhr, textStatus, errorThrown) {
+            //AJAX 실패
+            console.log(xhr, textStatus, errorThrown);
+          });
+      })
     </script>
 
     <!-- Optional JavaScript; choose one of the two! -->

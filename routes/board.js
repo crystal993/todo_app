@@ -35,7 +35,7 @@ router.post("/add", function (request, response) {
 
       var posts = {
         _id: 총게시물갯수 + 1,
-        작성자: request.user.id,
+        작성자: request.user._id,
         제목: request.body.title,
         날짜: request.body.date,
       };

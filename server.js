@@ -41,4 +41,8 @@ app.get("/", function (요청, 응답) {
 // app.use() : 미들웨어 
 //미들웨어 : 요청과 응답사이에 실행되는 코드
 app.use('/shop', require('./routes/shop.js'));
-app.use('/board', require('./routes/board.js'));
+app.use('/', require('./routes/board.js'));
+
+app.get('/upload', function(request,response){
+  response.render('upload.ejs');
+})

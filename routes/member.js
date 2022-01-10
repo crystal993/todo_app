@@ -40,7 +40,7 @@ router.post(
   }),
   function (request, response) {
     console.log(request.user._id);
-    response.render("index.ejs");
+    response.redirect("/");
   }
 );
 
@@ -111,7 +111,7 @@ passport.deserializeUser(function (아이디, done) {
 //로그아웃
 router.get("/logout", function (request, response) {
   request.logout();
-  response.render("index.ejs", {});
+  response.redirect("/");
 });
 
 //회원가입 페이지

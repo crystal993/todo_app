@@ -41,7 +41,8 @@
       <!-- base64라는 인코딩형식으로 인코딩되어서 전달된다.  -->
       <!-- enctype="multipart/form-data" : 인코딩하지 말고 바이너리 파일 그대로 전송을 의미 -->
       <form method="post" action="/upload" enctype="multipart/form-data">
-          <input type="file">
+          <input type="file" name="profile">
+          <button type="submit" class="btn btn-primary">전송</button>
       </form>
     </div>
 

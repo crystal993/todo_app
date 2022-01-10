@@ -57,7 +57,7 @@ function loginCheck(request, response, next) {
     next();
   } else {
     //request.user가 없으면 경고메세지
-    response.send("로그인 안 하셨는데요??");
+    response.redirect("/login");
   }
 }
 

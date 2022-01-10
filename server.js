@@ -343,8 +343,10 @@ app.get('/idCheck', (request,response) => {
     if(error){ console.log(error);}
 
     if(result) {
-      return response.status(200).send({id: result.id, message: "동일한 아이디가 존재합니다."});
-    } 
+      return response.status(200).send({id: result.id, message: "사용할 수 없는 아이디입니다."});
+    } else {
+      return response.send({message:"멋진 아이디네요!"});
+    }
   })
 })
 

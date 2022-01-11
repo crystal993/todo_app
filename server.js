@@ -1,5 +1,11 @@
 const express = require("express");
 const app = express();
+
+// 양방향 소켓 통신이 가능
+const http = require('http').createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(http);
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -17,14 +23,14 @@ app.use(methodOverride("_method"));
 require("dotenv").config();
 
 
-
+// 서버 띄우는 부분
 MongoClient.connect(process.env.DB_URL, function (error, client) {
   //연결되면 할 일
   if (error) return console.log(error);
 
   db = client.db("todoapp");
 
-  app.listen(process.env.PORT, function () {
+  http.listen(process.env.PORT, function () {
     console.log("listening on 8080");
   });
 });
@@ -74,3 +80,38 @@ app.get('/image/:imageName', function(request, response){
   response.sendFile( __dirname + '/public/image' + request.params.imageName);
 });
 
+// 웹소켓 페이지로 접속
+app.get('/socket', function(request, response){
+  response.render("socket.ejs");
+});
+
+// 웹소켓 접속시 
+io.on('connection', function(socket){
+  console.log('유저 접속됨');
+
+  // 채팅방 만들고 입장은 
+  // socket.join(방이름)
+  socket.on('join-room', function(data){
+    socket.join('room1');
+  });
+
+  // 채팅방1에만 broadcast
+  socket.on('room1-send', function(data){
+    io.to('room1').emit('broadcast', data);
+  });
+
+  // 서버가 유저가 보낸 메세지를 수신
+  // socket.on(작명, 콜백함수)
+  // 유저가 user-send이름으로 메세지를 보내면 내부코드 실행
+  socket.on('user-send', function(userData){
+    console.log(socket.id);
+
+    // 서버가 다시 유저에게 보내는 메세지
+    // io.emmit은 이 사이트 접속한 모든 사람한테 보내준다. => boradcast
+    io.emit('broadcast', userData);
+
+    //서버-유저1명간의 소통 - 나한테만, 1:1채팅도 만들 수 있다.
+    //io.to(socket.id).emit('broadcast', userData);
+  });
+
+});

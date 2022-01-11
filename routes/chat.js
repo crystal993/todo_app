@@ -100,5 +100,6 @@ router.get('/message/:id', loginCheck, function(request, response){
     });
 
 });
+  
 
 module.exports = router;

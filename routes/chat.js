@@ -1,6 +1,6 @@
 const res = require('express/lib/response');
 const { ObjectId } = require('mongodb');
-var router = require("express").Router();
+let router = require("express").Router();
 
 router.use("/", loginCheck);
 
@@ -47,7 +47,7 @@ router.post("/message", loginCheck, function(request, response){
     // 오늘 날짜,시간,공백제거    
     let today = dt.toLocaleDateString().replace(/(\s*)/g, "");
 
-    var msgData = {
+    let msgData = {
         parent : request.body.parent,
         content : request.body.content,
         userid : request.user._id,
@@ -64,6 +64,8 @@ router.post("/message", loginCheck, function(request, response){
 })
 
 //서버와 유저간의 실시간 소통채널 열기 
+//라이브러리 형식에 맞게 작성한 것임.
+// 소통 채널 접속시 메세지들 한번 찾아서 보내고 끝임.
 router.get('/message/:id', loginCheck, function(request, response){
     response.writeHead(200, {
         "Connection": "keep-alive",
@@ -71,12 +73,32 @@ router.get('/message/:id', loginCheck, function(request, response){
         "Cache-Control": "no-cache",
       });
     
+    // db에서 개설된 채팅 방의 아이디가 일치하면 채팅방 대화내용을 찾아옴.
     db.collection("message").find({ parent : request.params.id }).toArray()
     .then((result)=>{
         response.write('event: test\n');
-        response.write('data: ' + JSON.stringify(result) +'\n\n');  
+        response.write(`data: ${JSON.stringify(result)}\n\n`);  
     });  
+    
+    //change stream 설정 방법
 
-})
+
+    // 컬렉션안의 원하는 document만 감시하고 싶을 때
+    const pipeline = [
+        { $match : { 'fullDocument.parent' : request.params.id }}
+    ];
+
+    const collection = db.collection('message');
+    const changeStream = collection.watch(pipeline); //message컬렉션을 감시
+    
+    changeStream.on('change', (result)=>{
+        //해당 컬렉션이 변동되면 실행됨.
+        // console.log(result.fullDocument);
+        //이벤트명 작명
+        response.write('event: test\n');
+        response.write(`data: ${JSON.stringify([result.fullDocument])} \n\n`);
+    });
+
+});
 
 module.exports = router;

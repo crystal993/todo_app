@@ -51,9 +51,7 @@
            <div class="col-9 p-0">
              <div class="chat-room">
                 <ul class="list-group chat-content">
-                  <li><span class="chat-box">채팅방1 내용</span></li>
-                  <li><span class="chat-box">채팅방1 내용</span></li>
-                  <li><span class="chat-box mine">채팅방1 내용</span></li>
+                  <!-- 채팅방 내용 -->
                 </ul>
               <div class="input-group">
                 <input class="form-control" id="chat-input">
@@ -76,15 +74,31 @@
         $('.list-group-item').click(function(){
           curChatRoomId = this.dataset.id;
 
+          //채팅방 비우기 
+          $('.chat-content').html("");
+
+          if (eventSource != undefined){
+            // 이벤트 
+            eventSource.close();
+          }
           // 서버와 실시간 소통채널 개설 완료
           // 여기 채널 채팅방 입장
           eventSource = new EventSource("/message/" + curChatRoomId);
           
           // 데이터 수신은 new EventSource('/경로')에 이벤트리스너 부착
           eventSource.addEventListener('test', function(e){
-            console.log(JSON.parse(e.data));
-          })
-        })
+            
+            // 메세지를 가져옴.
+            var getMsg = JSON.parse(e.data);
+            console.log(getMsg);
+
+            // 메세지를 동적으로 chat-content영역에 뿌려줌.
+            getMsg.forEach(i => {
+              $('.chat-content').append('<li><span class="chat-box mine">'+ i.content + '</span></li>');
+            });
+
+          });
+        });
         
         $('#send').click((e)=>{
 

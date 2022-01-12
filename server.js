@@ -80,38 +80,52 @@ app.get('/image/:imageName', function(request, response){
   response.sendFile( __dirname + '/public/image' + request.params.imageName);
 });
 
-// 웹소켓 페이지로 접속
+// 채팅기능
+// 1. 웹소켓 페이지로 접속
 app.get('/socket', function(request, response){
-  response.render("socket.ejs");
+  console.log("웹소켓페이지 접속"+request.user._id);
+  db.collection("chatroom").find({member: request.user._id}).toArray().then((result)=>{
+    result.curUser = request.user._id;
+    response.render("socket.ejs", {data : result});
+  });
 });
 
-// 웹소켓 접속시 
+// 2. 웹소켓 접속시 채팅 기능
 io.on('connection', function(socket){
-  console.log('유저 접속됨');
 
-  // 채팅방 만들고 입장은 
+  let curChatRoom;
+
+  // 3. 채팅방 만들기 
   // socket.join(방이름)
   socket.on('join-room', function(data){
-    socket.join('room1');
+    curChatRoom = data;
+    console.log(curChatRoom + '접속됨');
+    socket.join(curChatRoom);
   });
 
-  // 채팅방1에만 broadcast
-  socket.on('room1-send', function(data){
-    io.to('room1').emit('broadcast', data);
+  // 4. 현재 채팅방에서 메세지 전송
+  socket.on('room-send', function(data){
+    console.log(data);
+    io.to(curChatRoom).emit('broadcast', {
+      msg : data.msg, 
+      userId : data.curUser,
+      msgTime : data.msgTime
+    });
+    
   });
 
-  // 서버가 유저가 보낸 메세지를 수신
-  // socket.on(작명, 콜백함수)
-  // 유저가 user-send이름으로 메세지를 보내면 내부코드 실행
-  socket.on('user-send', function(userData){
-    console.log(socket.id);
+  // // 서버가 유저가 보낸 메세지를 수신
+  // // socket.on(작명, 콜백함수)
+  // // 유저가 user-send이름으로 메세지를 보내면 내부코드 실행
+  // socket.on('user-send', function(userData){
+    // // console.log(socket.id);
 
-    // 서버가 다시 유저에게 보내는 메세지
-    // io.emmit은 이 사이트 접속한 모든 사람한테 보내준다. => boradcast
-    io.emit('broadcast', userData);
+    // // 서버가 다시 유저에게 보내는 메세지
+    // // io.emmit은 이 사이트 접속한 모든 사람한테 보내준다. => boradcast
+    // io.emit('broadcast', userData);
 
     //서버-유저1명간의 소통 - 나한테만, 1:1채팅도 만들 수 있다.
     //io.to(socket.id).emit('broadcast', userData);
-  });
+  // });
 
 });

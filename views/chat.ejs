@@ -66,6 +66,7 @@
       <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
       <script>
+        var socket = io();
 
         let curChatRoomId;
         let eventSource;
@@ -78,7 +79,7 @@
           $('.chat-content').html("");
 
           if (eventSource != undefined){
-            // 이벤트 
+            // 서버와 실시간 소통 채널 닫기
             eventSource.close();
           }
           // 서버와 실시간 소통채널 개설 완료

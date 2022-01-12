@@ -110,8 +110,14 @@ io.on('connection', function(socket){
       msg : data.msg, 
       userId : data.curUser,
       msgTime : data.msgTime
-    });
-    
+    });  
+  });
+
+  //5. 채팅방 나가기 
+  socket.on('user-leave', function(data){
+    console.log("현재채팅방 나감")
+    curChatRoom = data;
+    socket.leave(curChatRoom);
   });
 
   // // 서버가 유저가 보낸 메세지를 수신

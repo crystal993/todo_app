@@ -35,14 +35,18 @@
 
     <!-- socket.io 필요 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js" ></script>
-    
+   
+    <!-- nav bar -->
+    <%- include('nav.html') %>
+   
+   
     <div class="container p-4 detail">
 
       <div class="row">
         <div class="col-3">
           <ul class="list-group chat-list">
            <% for (let i = 0; i < data.length; i++) { %> 
-            <li class="list-group-item" data-id="<%= data[i]._id %>">
+            <li id="list-group-item" class="list-group-item" data-id="<%= data[i]._id %>">
               <h6><%= data[i].title %></h6>
               <h6 class="text-small"><%= data[i].member[0] %></h6>
             </li>
@@ -63,6 +67,8 @@
                 <input class="form-control" id="chat-input">
                 <button class="btn btn-secondary" id="send">전송</button>
               </div>
+              <br>
+              <button clss="btn btn-info" id="user-left">현재 채팅방 나가기</button>
             </div>
         </div>
       </div> 
@@ -80,10 +86,11 @@
         // 변수들
         var socket = io(); // 소켓 변수
         let curUser = $('#curUser').val(); // 현재 접속한 유저 
+        let joinCheck=0;
 
-        //1. 채팅방 클릭
+        //1. 채팅방 클릭 - 아이디 가져오기(방 하나만 선택)
         $('.list-group-item').click(function(){
-          
+
           //2. 채팅창 띄우기
           $('.chat-room').show();
 
@@ -97,51 +104,62 @@
           console.log(curChatRoomId + '채팅방 입장');
           socket.emit('join-room', curChatRoomId);
 
-          //6. 전송 버튼 누르기
-          $("#send").click(function(){
-            console.log('전송버튼 누름')
-
-            // 메세지 보낸 시간 누를 때마다 계산
-            let date_ob = new Date();
-            let hours = date_ob.getHours();
-            let minutes = date_ob.getMinutes();
-            let msgTime;
-
-            if (hours > 12) {
-              hours = hours - 12;
-              msgTime = `오후 ${hours}:${minutes}`;
-            } else {
-              msgTime = `오전 ${hours}:${minutes}`;
-            }
-
-            // 전송할 데이터 : msg, curUser, msgTime
-            let sendData = {
-              msg : $("#chat-input").val(),
-              curUser : curUser,
-              msgTime : msgTime
-            }
-
-            // 7. 서버에 메세지 전송
-            socket.emit('room-send',sendData);
+          // 10. 채팅방 나가기
+          $("#user-left").click(function(){
+            console.log(`${curChatRoomId} 채팅방 퇴장`);
             
-            // 8. 서버에서 메세지 수신
-            socket.on('broadcast', function (data){
-              console.log('client:' , data);
-              
-             // 9. 내가 보낸 메세지와 상대방이 보낸 메세지 구분
-              if (curUser === data.userId){
-                $('.chat-content').append(`<li><span class="chat-box mine-box">${data.msg}</span>
-                  </li><li><p class="chat-time mine-time">${data.msgTime}</p></li>`);
-              } else {
-                $('.chat-content').append(`<li><span class="chat-box">${data.msg}</span>
-                </li><li><p class="chat-time">${data.msgTime}</p></li>`);
-              }
-            });
+            // 11. 현재 채팅방 나가기
+            socket.emit('user-leave',curChatRoomId);
+            
+            // 12. 채팅방 ui 없애기
+            $('.chat-room').hide();
           });
         });
 
         
+        //6. 전송 버튼 누르기
+        $("#send").click(function(){
+          console.log('전송버튼 누름')
 
+          // 메세지 보낸 시간 누를 때마다 계산
+          let date_ob = new Date();
+          let hours = date_ob.getHours();
+          let minutes = date_ob.getMinutes();
+          let msgTime;
+
+          if (hours > 12) {
+            hours = hours - 12;
+            msgTime = `오후 ${hours}:${minutes}`;
+          } else {
+            msgTime = `오전 ${hours}:${minutes}`;
+          }
+
+          // 전송할 데이터 : msg, curUser, msgTime
+          let sendData = {
+            msg : $("#chat-input").val(),
+            curUser : curUser,
+            msgTime : msgTime
+          }
+
+          // 7. 서버에 메세지 전송
+          socket.emit('room-send',sendData);
+        });
+
+        // 8. 서버에서 메세지 수신
+        socket.on('broadcast', function (data){
+        console.log('client:' , data);
+            
+        // 9. 내가 보낸 메세지와 상대방이 보낸 메세지 구분
+          if (curUser === data.userId){
+            $('.chat-content').append(`<li><span class="chat-box mine-box">${data.msg}</span>
+              </li><li><p class="chat-time mine-time">${data.msgTime}</p></li>`);
+          } else {
+            $('.chat-content').append(`<li><span class="chat-box">${data.msg}</span>
+            </li><li><p class="chat-time">${data.msgTime}</p></li>`);
+          }
+        });
+
+        
         // // 채팅방1 입장 버튼 
         // $('#room1').click(function(){
         //   console.log('입장');

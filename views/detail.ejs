@@ -38,7 +38,8 @@
         <div class="card-body">
           <h5 class="card-title"><%= data.제목 %></h5>
           <h6 class="card-subtitle mb-2 text-muted"><%= data.날짜 %></h6>
-          <a href="/edit" class="card-link">수정</a>
+          <p class="card-text"><%= data.세부내용 %></p>
+          <a href="/edit/<%= data._id %>" class="card-link">수정</a>
         </div>
       </div>
     </div>

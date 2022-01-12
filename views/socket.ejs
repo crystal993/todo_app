@@ -68,7 +68,7 @@
                 <button class="btn btn-secondary" id="send">전송</button>
               </div>
               <br>
-              <button clss="btn btn-info" id="user-left">현재 채팅방 나가기</button>
+              <button class="btn btn-outline-secondary center_sj" id="user-left">현재 채팅방 나가기</button>
             </div>
         </div>
       </div> 
@@ -125,6 +125,7 @@
           let date_ob = new Date();
           let hours = date_ob.getHours();
           let minutes = date_ob.getMinutes();
+          if(minutes.toString().length==1) minutes = "0" + minutes;
           let msgTime;
 
           if (hours > 12) {

@@ -20,11 +20,17 @@ router.get("/write", function (request, response) {
 
 // 게시글 등록
 router.post("/add", function (request, response) {
-  // 참고 : response.send()이 부분은 없으면 브라우저 멈춤
-  // 실패하든 성공하든 무조건 무언가 보내줘야 함.
-  response.send("등록 성공");
   console.log(request.body.title);
   console.log(request.body.date);
+
+  //오늘 날짜 생성
+  let today = new Date();   
+
+  let year = today.getFullYear(); // 년도
+  let month = today.getMonth() + 1;  // 월
+  let date = today.getDate();  // 날짜
+
+  let todayPost = `${year}.${month}.${date}`;
 
   //1. db에 counter컬렉션에 현재 총 게시물 갯수 데이터 찾아오기
   db.collection("counter").findOne(
@@ -37,7 +43,8 @@ router.post("/add", function (request, response) {
         _id: 총게시물갯수 + 1,
         작성자: request.user._id,
         제목: request.body.title,
-        날짜: request.body.date,
+        세부내용 : request.body.contents,
+        날짜: todayPost,
       };
 
       //2. db에 todo id,제목,날짜 저장
@@ -52,6 +59,7 @@ router.post("/add", function (request, response) {
             if (error) {
               return console.log(error);
             }
+            response.redirect('/list');
           }
         );
       });
@@ -133,12 +141,10 @@ router.put("/edit", function (request, response) {
   //폼에 담긴 제목, 날짜 데이터를 수정
   db.collection("post").updateOne(
     { _id: parseInt(request.body.id) },
-    { $set: { 제목: request.body.title, 날짜: request.body.date } },
+    { $set: { 제목: request.body.title, 날짜: request.body.date, 세부내용: request.body.contents } },
     function (error, result) {
       console.log("수정완료");
-      response.render("list.ejs", {
-        isAuthenticated: request.isAuthenticated(),
-      });
+      response.redirect("/list");
     }
   );
 });

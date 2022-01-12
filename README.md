@@ -3,8 +3,9 @@
 ### 할일 목록, 채팅 웹앱
 
 #### 1. 버전
-node.js v16.13.1
-mongoDB v3.6.4
+- node.js v16.13.1
+- mongoDB v3.6.4
+- bootstrap
 
 #### 2. 기간
 기간 : 2022.01.03 ~ 계속 진행중
@@ -21,7 +22,7 @@ mongoDB v3.6.4
   - 다른사람 글에는 채팅신청버튼 
 -  실시간 채팅 구현 - socket.io 4.4.1
 
-- 실시간 채팅내용 db  개발 중 
+- 실시간 채팅내용 db에 저장하는 부분 개발 중 
 
 ### 링크 - GCP로 배포
 [할 일 목록 앱](https://galvanic-deck-337804.du.r.appspot.com).
